@@ -1,0 +1,28 @@
+##################################
+# configuration for nutNotify.sh #
+#           EXAMPLE              #
+##################################
+
+subjectDefault="$HOSTNAME UPS event $argument on $ups@$server !"		#default subject
+bodyDefault="UPS event $argument on $ups at $(date +'%d-%m-%y %H:%M:%S')" # default body message
+
+#--- Data for mail ---#
+FROM=""																	#sender
+dom=$(echo "$FROM" | awk -F'@' '{printf $2}')							#don't change it
+MAILTO=""																#recipient(s)
+subjectMail="$subjectDefault"											#subject sent by mail
+textMail="$bodyDefault"													#body message sent by mail
+
+#--- Data for SMS ---#
+providerSms=jumblo.com													#Betamax/Dellmont provider with sms API
+usernameSms=""															#username
+passwordSms=""															#password
+fromSms=$usernameSms													#from a mobile number configure into your Batamax/dellmont account or your username
+toSms=+32xxxxxxxx														#the mobile number to send to
+textSms="$bodyDefault"													#body message to send by SMS
+
+#--- Data for pushBullet ---#
+providerApi='https://api.pushbullet.com/v2/pushes'
+accessToken='o.xxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+subjectPushBullet="$HOSTNAME UPS event $argument"						#subject sent by pushBullet
+textPushBullet="$bodyDefault"											#body message sent by pushBullet
