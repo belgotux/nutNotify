@@ -26,3 +26,10 @@ providerApi='https://api.pushbullet.com/v2/pushes'
 accessToken='o.xxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 subjectPushBullet="$HOSTNAME UPS event $argument"						#subject sent by pushBullet
 textPushBullet="$bodyDefault"											#body message sent by pushBullet
+
+#--- Data for Pushover ---#
+providerApi='https://api.pushover.net/1/messages.json'
+appToken='xxxxxxxxxxxxxxxxxxxxxxxxxxxx'									#ApplicationToken
+userkey='xxxxxxxxxxxxxxxxxxxxxxxxxxxx'									#UserKey
+subjectPushover="$HOSTNAME UPS event $argument"							#subject sent by Pushover
+textPushover="$bodyDefault"												#body message sent by Pushover
