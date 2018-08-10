@@ -146,8 +146,8 @@ function sendPushBullet {
 	
 	#var verification
 	if [ "$providerApi" == "" ] || [ "$accessToken" == "" ] ; then
-		echo "Can't sen push notification without complete variables for PushBullet" 1>&2
-		addLog "Can't sen push notification without complete variables for PushBullet"
+		echo "Can't send push notification without complete variables for PushBullet" 1>&2
+		addLog "Can't send push notification without complete variables for PushBullet"
 		return 1
 	fi
 	
@@ -157,12 +157,37 @@ function sendPushBullet {
 	rm $tempfile
 }
 
+function sendPushover {
+	#replace default mesg
+	if [ "$1" != "" ] ; then
+		subjectPushover=$1
+	fi
+	if [ "$2" != "" ] ; then
+		textPushover=$2
+	fi
+	
+	#var verification
+	if [ "$providerApi" == "" ] || [ "$appToken" == "" ] || [ "$userkey" == "" ] ; then
+		echo "Can't send push notification without complete variables for Pushover" 1>&2
+		addLog "Can't send push notification without complete variables for Pushover"
+		return 1
+	fi
+	
+	curl -s \
+	--form-string "token=$appToken" \
+	--form-string "user=$userkey" \
+	--form-string "title=$subjectPushover" \
+	--form-string "message=$textPushover" \
+	$providerApi
+}
+
 case "$argument" in
 ONLINE)
 	text="UPS $ups is now online at $(date +'%H:%M:%S')"
 	writeLog
 	sendMail "$subjectMail" "$text"
 	sendPushBullet "$subjectPushBullet" "$text"
+	sendPushover "$subjectPushBullet" "$text"
 ;;
 
 ONBATT)
@@ -171,6 +196,7 @@ ONBATT)
 	sendMail "$subjectMail" "$text"
 	sendPushBullet "$subjectPushBullet" "$text"
 #	sendSms "$text"
+	sendPushover "$subjectPushBullet" "$text"
 ;;
 
 LOWBATT)
@@ -180,6 +206,7 @@ LOWBATT)
 	sendMail "$subjectMail" "$text"
 	sendPushBullet "$subjectPushBullet" "$text"
 #	sendSms "$text"
+	sendPushover "$subjectPushBullet" "$text"
 ;;
 
 FSD)
@@ -189,6 +216,7 @@ FSD)
 	sendMail "$subjectMail" "$text"
 	sendPushBullet "$subjectPushBullet" "$text"
 #	sendSms "$text"
+	sendPushover "$subjectPushBullet" "$text"
 ;;
 
 SHUTDOWN)
@@ -198,6 +226,7 @@ SHUTDOWN)
 	sendMail "$subjectMail" "$text"
 	sendPushBullet "$subjectPushBullet" "$text"
 #	sendSms "$text"
+	sendPushover "$subjectPushBullet" "$text"
 ;;
 
 COMMOK|COMMBAD|REPLBATT|NOCOMM)
@@ -205,6 +234,7 @@ COMMOK|COMMBAD|REPLBATT|NOCOMM)
 	sendMail
 	sendPushBullet
 	#sendSms
+	sendPushover "$subjectPushBullet" "$text"
 ;;
 
 SERVERONLINE)
@@ -217,6 +247,7 @@ SERVERONLINE)
 		writeLog && \
 		sendMail "$subjectMail" "$text"
 		sendPushBullet "$subjectPushBullet" "$text"
+		sendPushover "$subjectPushBullet" "$text"
 	fi
 ;;
 
