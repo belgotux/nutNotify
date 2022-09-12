@@ -1,0 +1,19 @@
+[Unit]
+Description=send mail at boot after a power loss
+After=network.target postfix.service
+ConditionPathExists=/etc/nut/nut.conf
+
+[Service]
+Type=simple
+User=root
+Group=root
+ExecStart=/usr/local/bin/nutNotifyBoot.sh
+
+SuccessExitStatus=0
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+
