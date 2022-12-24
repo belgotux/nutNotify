@@ -4,11 +4,12 @@ logfile=/var/log/nutNotify/nutNotify.log
 flagfile=/var/log/nutNotify/nutShutdown.flag
 BIN_MAIL=/usr/bin/mail
 BIN_PUSHBULLET=/usr/local/bin/pushbullet.sh
+BIN_TELEGRAM=/usr/local/bin/telegram-notification.sh
 
 MAILTO=root
 
 function aide() {
-	echo "$0 [mail|pushbullet]"
+	echo "$0 [mail|pushbullet|telegram]"
 }
 
 # add to log
@@ -51,6 +52,8 @@ if [ -e $flagfile ] ; then
     	echo -e "$(date '+%d/%m/%y %H:%M:%S') $HOSTNAME booting\n Downtime $(date -d @$(( $(date +'%s') - $(cat $flagfile))) -u +%H:%M:%S)" | mail -s "booting $HOSTNAME" $MAILTO ;;
 	pushbullet)
 		$BIN_PUSHBULLET "booting $HOSTNAME" "$(date '+%d/%m/%y %H:%M:%S') $HOSTNAME booting - Downtime $(date -d @$(( $(date +'%s') - $(cat $flagfile))) -u +%H:%M:%S)" ;;
+	telegram)
+		$BIN_TELEGRAM "$(date '+%d/%m/%y %H:%M:%S') $HOSTNAME booting - Downtime $(date -d @$(( $(date +'%s') - $(cat $flagfile))) -u +%H:%M:%S)" "booting $HOSTNAME" ;;
 	esac
     rm $flagfile
 fi

@@ -136,7 +136,7 @@ function sendSms {
 # $1 title
 # $2 text body - default $textPushBullet
 function sendPushBullet {
-	# replace default mesg
+	#replace default mesg
 	if [ "$1" != "" ] ; then
 		subjectPushBullet=$1
 	fi
@@ -144,17 +144,47 @@ function sendPushBullet {
 		textPushBullet=$2
 	fi
 	
-	# var verification
-	if [ "$providerApi" == "" ] || [ "$accessToken" == "" ] ; then
+	#var verification
+	if [ "$pushbulletProviderApi" == "" ] || [ "$pushbulletAccessToken" == "" ] ; then
 		echo "Can't sen push notification without complete variables for PushBullet" 1>&2
 		addLog "Can't sen push notification without complete variables for PushBullet"
 		return 1
 	fi
 	
-	tempfile=$(tempfile -p 'nutNotifyPushBullet-')
-	curl -s -o $tempfile --header "Access-Token: $accessToken" --header 'Content-Type: application/json' --request POST --data-binary "{\"type\":\"note\",\"title\":\"$subjectPushBullet\",\"body\":\"$textPushBullet\"}" "$providerApi"
-	# TODO check return
+	tempfile=$(mktemp --suffix '.nutNotifyPushBullet')
+	curl -s -o "$tempfile" --header "Access-Token: $pushbulletAccessToken" --header 'Content-Type: application/json' --request POST --data-binary "{\"type\":\"note\",\"title\":\"$HOSTNAME - $subjectPushBullet\",\"body\":\"$textPushBullet\"}" "$pushbulletProviderApi"
+	returnCurl=$?
+	if [ $returnCurl -ne 0 ] ; then cat $tempfile ; fi
 	rm $tempfile
+	return $?
+}
+
+#send push notification with Telegram
+# $1 message
+# $2 title
+# $3 emoji
+function sendTelegram {
+	#replace default mesg
+	if  [ "$2" != "" ] && [ "$3" != "" ]  ; then
+		local textTelegram=$(echo -e "$3 $HOSTNAME $3 $2\n$1")
+	elif [ "$2" != "" ] ; then
+		local textTelegram=$(echo -e "$HOSTNAME - $2 \n$1")
+	else
+		local textTelegram="$3$HOSTNAME : $1"
+	fi
+	#var verification
+	if [ "$telegramProviderApi" == "" ] || [ "$telegramAccessToken" == "" ] ; then
+		echo "Can't send notification without complete variables for Telegram" 1>&2
+		addLog "Can't send notification without complete variables for Telegram"
+		return 1
+	fi
+	
+	tempfile=$(mktemp --suffix '.telegram-notification')
+	curl -s -o "$tempfile" --data "chat_id=${telegramChatID}" --data "text=${textTelegram}" "${telegramProviderApi}/bot${telegramAccessToken}/sendMessage"
+	returnCurl=$?
+	if [ $returnCurl -ne 0 ] ; then cat $tempfile ; fi
+	rm $tempfile
+	return $returnCurl
 }
 
 case "$argument" in
@@ -162,14 +192,17 @@ ONLINE)
 	text="UPS $ups is now online at $(date +'%H:%M:%S')"
 	writeLog
 	sendMail "$subjectMail" "$text"
-	sendPushBullet "$subjectPushBullet" "$text"
+	#sendPushBullet "$pushbulletSubject" "$text"
+	sendTelegram "$text" "$telegramSubject"
 ;;
 
 ONBATT)
 	text="Powercut at $(date +'%H:%M:%S')! UPS $ups run on battery!"
 	writeLog
-	sendMail "$subjectMail" "$text"
-	sendPushBullet "$subjectPushBullet" "$text"
+	#sendMail "$subjectMail" "$text"
+	#sendPushBullet "$pushbulletSubject" "$text"
+	emoji=$(echo -e "\xE2\x9A\xA0")
+	sendTelegram "$text" "$telegramSubject" "$emoji"
 #	sendSms "$text"
 ;;
 
@@ -177,8 +210,10 @@ LOWBATT)
 	# note : notify get when /sbin/upsdrvctl shutdown executed
 	text="Low level battery at $(date +'%H:%M:%S') UPS $ups... Shutdown imminent !"
 	writeLog
-	sendMail "$subjectMail" "$text"
-	sendPushBullet "$subjectPushBullet" "$text"
+	#sendMail "$subjectMail" "$text"
+	#sendPushBullet "$pushbulletSubject" "$text"
+	emoji=$(echo -e "\xF0\x9F\x94\xA5")
+	sendTelegram "$text" "$telegramSubject" "$emoji"
 #	sendSms "$text"
 ;;
 
@@ -186,8 +221,10 @@ FSD)
 	# note : for slave only
 	text="Force shutdown slave server $server at $(date +'%H:%M:%S') !"
 	writeLog
-	sendMail "$subjectMail" "$text"
-	sendPushBullet "$subjectPushBullet" "$text"
+	#sendMail "$subjectMail" "$text"
+	#sendPushBullet "$pushbulletSubject" "$text"
+	emoji=$(echo -e "\xE2\x9A\xA0")
+	sendTelegram "$text" "$telegramSubject" "$emoji"
 #	sendSms "$text"
 ;;
 
@@ -195,15 +232,18 @@ SHUTDOWN)
 	# note : executed on the master only
 	text="Shutdown master serveur $server at $(date +'%H:%M:%S') !"
 	writeLog
-	sendMail "$subjectMail" "$text"
-	sendPushBullet "$subjectPushBullet" "$text"
+	#sendMail "$subjectMail" "$text"
+	#sendPushBullet "$pushbulletSubject" "$text"
+	emoji=$(echo -e "\xF0\x9F\x94\xA5")
+	sendTelegram "$text" "$telegramSubject" "$emoji"
 #	sendSms "$text"
 ;;
 
 COMMOK|COMMBAD|REPLBATT|NOCOMM)
 	writeLog
-	sendMail
-	sendPushBullet
+	#sendMail
+	#sendPushBullet
+	sendTelegram "$text" "$telegramSubject"
 	# sendSms
 ;;
 
@@ -216,7 +256,8 @@ SERVERONLINE)
 		rm -f $powerdownflag && \
 		writeLog && \
 		sendMail "$subjectMail" "$text"
-		sendPushBullet "$subjectPushBullet" "$text"
+		sendPushBullet "$pushbulletSubject" "$text"
+  	sendTelegram "$text" "$telegramSubject"
 	fi
 ;;
 
