@@ -1,39 +1,35 @@
 #!/bin/bash
-# Variables
-logfile=/var/log/nutNotify/nutNotify.log
-flagfile=/var/log/nutNotify/nutShutdown.flag
-BIN_MAIL=/usr/bin/mail
-BIN_PUSHBULLET=/usr/local/bin/pushbullet.sh
-BIN_TELEGRAM=/usr/local/bin/telegram-notification.sh
 
-MAILTO=root
+# variables
+configFile=/usr/local/etc/nutNotify.conf
+
+source "$configFile"
+source "$(dirname $0)/nutNotifyFct.sh"
+
+if [ ! -e "$configFile" ] ; then
+	echo "File $configFile doesn't exist" 1>&2
+	exit 1
+fi
 
 function aide() {
 	echo "$0 [mail|pushbullet|telegram]"
 }
 
-# add to log
-function addLog() {
-	if [ "$logfile" == "" ] ; then
-		echo "Can't write to log !" 1>&2
-		return 1
-	else
-		echo "$(date +'%a %d %H:%M:%S') $1" >> $logfile
-		return $?
-	fi
-}
-
+# verify method
 if [ $# == 0 ] ; then
-	if [ ! -e $BIN_MAIL ] ; then
-		echo "Error $BIN_MAIL not found" 1>&2 && exit 1
+	if [ ! -x $mailBin ] ; then
+		echo "No mail command found at $mailBin, you need to install bsd-mailx!" 1>&2
+		exit 1
 	fi
 	notifynut_method=mail
 elif [ $# == 1 ] ; then
-	if [ "$1" == "mail" ] && [ ! -e $BIN_MAIL ] ; then
+	if [ "$1" == "mail" ] && [ ! -e $mailBin ] ; then
 		echo "Error $BIN_MAIL not found" 1>&2 && exit 1
-	elif [ "$1" == "pushbullet" ] && [ ! -e $BIN_PUSHBULLET ] ; then
-		echo "Error $BIN_PUSHBULLET not found" 1>&2 && exit 1
-	elif [ "$1" == "mail" ] || [ "$1" == "pushbullet" ] ; then
+	elif [ "$1" == "pushbullet" ] && [ ! -x $curlBin ] && [ "$pushbulletAccessToken" != "" ] ; then
+		echo "Error pushbullet not configured" 1>&2 && echo "Error telegram not configured" > $logfile && exit 1
+	elif [ "$1" == "telegram" ] && [ ! -x $curlBin ] && [ "$telegramAccessToken" != "" ] && [ "$telegramChatID" != "" ] ; then
+		echo "Error telegram not configured" 1>&2 && echo "Error telegram not configured" > $logfile && exit 1
+	elif [ "$1" == "mail" ] || [ "$1" == "pushbullet" ] || [ "$1" == "telegram" ] ; then
 		notifynut_method="$1"
 	else
 		aide
@@ -44,16 +40,16 @@ fi
 
 
 
-
+text="$(date '+%d/%m/%y %H:%M:%S') $HOSTNAME booting\n Downtime $(date -d @$(( $(date +'%s') - $(cat $flagfile))) -u +%H:%M:%S)"
 
 if [ -e $flagfile ] ; then
 	case "$notifynut_method" in
 	mail)
-    	echo -e "$(date '+%d/%m/%y %H:%M:%S') $HOSTNAME booting\n Downtime $(date -d @$(( $(date +'%s') - $(cat $flagfile))) -u +%H:%M:%S)" | mail -s "booting $HOSTNAME" $MAILTO ;;
+    	sendMail "$subjectMail" "$text" ;;
 	pushbullet)
-		$BIN_PUSHBULLET "booting $HOSTNAME" "$(date '+%d/%m/%y %H:%M:%S') $HOSTNAME booting - Downtime $(date -d @$(( $(date +'%s') - $(cat $flagfile))) -u +%H:%M:%S)" ;;
+		sendPushBullet "$pushbulletSubject" "$text" ;;
 	telegram)
-		$BIN_TELEGRAM "$(date '+%d/%m/%y %H:%M:%S') $HOSTNAME booting - Downtime $(date -d @$(( $(date +'%s') - $(cat $flagfile))) -u +%H:%M:%S)" "booting $HOSTNAME" ;;
+		sendTelegram "$text" "$telegramSubject" ;;
 	esac
     rm $flagfile
 fi

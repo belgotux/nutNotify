@@ -1,7 +1,9 @@
 [Unit]
 Description=send mail at boot after a power loss
 After=network.target postfix.service
-ConditionPathExists=/etc/nut/nut.conf
+ConditionPathExists=/usr/local/etc/nutNotify.conf
+ConditionFileIsExecutable=/usr/local/bin/nutNotifyBoot.sh
+ConditionPathIsDirectory=/var/log/nutNotify
 
 [Service]
 Type=simple

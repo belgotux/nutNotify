@@ -3,12 +3,16 @@
 #           EXAMPLE              #
 ##################################
 
+logfile=/var/log/nutNotify/nutNotify.log											# logfile for nutNotify
+flagfile=/var/log/nutNotify/nutShutdown.flag
+curlBin="/usr/bin/curl"
+mailBin="/usr/bin/mail"
+
 subjectDefault="$HOSTNAME UPS event $argument on $ups@$server !"		#default subject
 bodyDefault="UPS event $argument on $ups at $(date +'%d-%m-%y %H:%M:%S')" # default body message
 
 #--- Data for mail ---#
 FROM=""																	#sender
-dom=$(echo "$FROM" | awk -F'@' '{printf $2}')							#don't change it
 MAILTO=""																#recipient(s)
 subjectMail="$subjectDefault"											#subject sent by mail
 textMail="$bodyDefault"													#body message sent by mail

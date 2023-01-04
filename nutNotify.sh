@@ -27,10 +27,10 @@ server=$(echo "$1" | awk '{printf $2}' | awk -F "[@:]" '{print $2}')
 powerdownflag=$(sed -ne 's#^ *POWERDOWNFLAG *\(.*\)$#\1#p' /etc/nut/upsmon.conf)
 
 # Variables
-logfile=/var/log/nutNotify.log											# logfile for nutNotify
-curlBin="/usr/bin/curl"
-mailBin="/usr/bin/mail"
-configFile=/usr/local/bin/nutNotify.conf
+configFile=/usr/local/etc/nutNotify.conf
+
+source "$configFile"
+source "$(dirname $0)/nutNotifyFct.sh"
 
 if [ ! -e "$configFile" ] ; then
 	echo "File $configFile doesn't exist" 1>&2
@@ -46,10 +46,6 @@ if [ ! -x $mailBin ] ; then
 	echo "No mail command found at $mailBin, you need to install bsd-mailx!" 1>&2
 	exit 1
 fi
-
-source "$configFile"
-source "$(dirname $0)/nutNotifyFct.sh"
-
 
 case "$argument" in
 ONLINE)
