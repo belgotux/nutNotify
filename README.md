@@ -12,6 +12,7 @@ Script to be notified by your UPS with differents notifications :
 - Copy `systemd-notify` to `/lib/systemd/system/nut-notify-boot.service`
 - systemctl reload daemon and enable `nut-notify-boot`
 - Create folder `/var/log/nutNotify` with nut rights
+- Copy logrotate file to `/etc/logrotate.d`
 
 ```
 git clone https://github.com/belgotux/nutNotify.git
@@ -24,6 +25,7 @@ systemctl daemon-reload
 systemctl enable nut-notify-boot.service
 mkdir /var/log/nutNotify
 chown nut:nut /var/log/nutNotify
+cp nutNotify.logrotate /etc/logrotate.d
 ```
 
 

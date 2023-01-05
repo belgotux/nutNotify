@@ -1,0 +1,10 @@
+/var/log/nutNotify/nutNotify.log {
+  monthly
+  rotate 4
+  compress
+  # Do not rotate if empty
+  notifempty
+
+  missingok 
+  create 640 nut nut
+}
