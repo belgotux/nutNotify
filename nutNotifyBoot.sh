@@ -45,11 +45,11 @@ text="$(date '+%d/%m/%y %H:%M:%S') $HOSTNAME booting\n Downtime $(date -d @$(( $
 if [ -e $flagfile ] ; then
 	case "$notifynut_method" in
 	mail)
-    	sendMail "$subjectMail" "$text" ;;
+    sendMail "$subjectMail" "$text" ;;
 	pushbullet)
-		sendPushBullet "$pushbulletSubject" "$text" ;;
+		sleep 30; sendPushBullet "$pushbulletSubject" "$text" ;;
 	telegram)
-		sendTelegram "$text" "$telegramSubject" ;;
+		sleep30; sendTelegram "$text" "$telegramSubject" ;;
 	esac
     rm $flagfile
 fi
