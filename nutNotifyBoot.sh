@@ -49,7 +49,9 @@ if [ -e $flagfile ] ; then
 	pushbullet)
 		sleep 30; sendPushBullet "$pushbulletSubject" "$text" ;;
 	telegram)
-		sleep30; sendTelegram "$text" "$telegramSubject" ;;
+		sleep 30; sendTelegram "$text" "$telegramSubject" ;;
+	pushover)
+		sleep 30; sendPushover "$text" "$pushoverSubject" ;;
 	esac
     rm $flagfile
 fi
