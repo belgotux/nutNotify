@@ -37,3 +37,10 @@ telegramAccessToken=''
 telegramChatID=''
 telegramSubject="UPS event $argument"						#subject sent by telegram
 telegramMessage="$bodyDefault"											#body message sent by telegram
+
+#--- Data for Pushover ---#
+pushoverProviderApi='https://api.pushover.net/1/messages.json'
+pushoverAppToken='xxxxxxxxxxxxxxxxxxxxxxxxxxxx'		#ApplicationToken
+pushoverUserkey='xxxxxxxxxxxxxxxxxxxxxxxxxxxx'		#UserKey
+pushoverSubject="UPS event $argument"							#subject sent by Pushover
+pushoverMessage="$bodyDefault"										#body message sent by Pushover

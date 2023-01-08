@@ -86,8 +86,8 @@ function sendPushBullet {
 	
 	#var verification
 	if [ "$pushbulletProviderApi" == "" ] || [ "$pushbulletAccessToken" == "" ] ; then
-		echo "Can't sen push notification without complete variables for PushBullet" 1>&2
-		addLog "Can't sen push notification without complete variables for PushBullet"
+		echo "Can't send push notification without complete variables for PushBullet" 1>&2
+		addLog "Can't send push notification without complete variables for PushBullet"
 		return 1
 	fi
 	
@@ -121,6 +121,35 @@ function sendTelegram {
 	
 	tempfile=$(mktemp --suffix '.telegram-notification')
 	curl -s -o "$tempfile" --data "chat_id=${telegramChatID}" --data "text=${textTelegram}" "${telegramProviderApi}/bot${telegramAccessToken}/sendMessage"
+	returnCurl=$?
+	if [ $returnCurl -ne 0 ] ; then cat $tempfile ; fi
+	rm $tempfile
+	return $returnCurl
+}
+
+function sendPushover {
+	#replace default mesg
+	if [ "$1" != "" ] ; then
+		subjectPushover=$1
+	fi
+	if [ "$2" != "" ] ; then
+		textPushover=$2
+	fi
+	
+	#var verification
+	if [ "$pushoverProviderApi" == "" ] || [ "$pushoverAppToken" == "" ] || [ "$pushoverUserkey" == "" ] ; then
+		echo "Can't send push notification without complete variables for Pushover" 1>&2
+		addLog "Can't send push notification without complete variables for Pushover"
+		return 1
+	fi
+	
+	tempfile=$(mktemp --suffix '.nutNotifyPushOver')
+	curl -s \
+	--form-string "token=$pushoverAppToken" \
+	--form-string "user=$pushoverUserkey" \
+	--form-string "title=$subjectPushover" \
+	--form-string "message=$textPushover" \
+	$pushoverProviderApi
 	returnCurl=$?
 	if [ $returnCurl -ne 0 ] ; then cat $tempfile ; fi
 	rm $tempfile

@@ -53,6 +53,7 @@ ONLINE)
 	writeLog
 	sendMail "$subjectMail" "$text"
 	#sendPushBullet "$pushbulletSubject" "$text"
+	#sendPushover "$pushoverSubject" "$text"
 	sendTelegram "$text" "$telegramSubject"
 ;;
 
@@ -61,6 +62,7 @@ ONBATT)
 	writeLog
 	#sendMail "$subjectMail" "$text"
 	#sendPushBullet "$pushbulletSubject" "$text"
+	#sendPushover "$pushoverSubject" "$text"
 	emoji=$(echo -e "\xE2\x9A\xA0")
 	sendTelegram "$text" "$telegramSubject" "$emoji"
 #	sendSms "$text"
@@ -72,6 +74,7 @@ LOWBATT)
 	writeLog
 	#sendMail "$subjectMail" "$text"
 	#sendPushBullet "$pushbulletSubject" "$text"
+	#sendPushover "$pushoverSubject" "$text"
 	emoji=$(echo -e "\xF0\x9F\x94\xA5")
 	sendTelegram "$text" "$telegramSubject" "$emoji"
 #	sendSms "$text"
@@ -83,6 +86,7 @@ FSD)
 	writeLog
 	#sendMail "$subjectMail" "$text"
 	#sendPushBullet "$pushbulletSubject" "$text"
+	#sendPushover "$pushoverSubject" "$text"
 	emoji=$(echo -e "\xE2\x9A\xA0")
 	sendTelegram "$text" "$telegramSubject" "$emoji"
 #	sendSms "$text"
@@ -94,6 +98,7 @@ SHUTDOWN)
 	writeLog
 	#sendMail "$subjectMail" "$text"
 	#sendPushBullet "$pushbulletSubject" "$text"
+	#sendPushover "$pushoverSubject" "$text"
 	emoji=$(echo -e "\xF0\x9F\x94\xA5")
 	sendTelegram "$text" "$telegramSubject" "$emoji"
 #	sendSms "$text"
@@ -103,6 +108,7 @@ COMMOK|COMMBAD|REPLBATT|NOCOMM)
 	writeLog
 	#sendMail
 	#sendPushBullet
+	#sendPushover "$pushoverSubject" "$text"
 	sendTelegram "$text" "$telegramSubject"
 	# sendSms
 ;;
@@ -116,7 +122,8 @@ SERVERONLINE)
 		rm -f $powerdownflag && \
 		writeLog && \
 		sendMail "$subjectMail" "$text"
-		sendPushBullet "$pushbulletSubject" "$text"
+		#sendPushBullet "$pushbulletSubject" "$text"
+		#sendPushover "$pushoverSubject" "$text"
   	sendTelegram "$text" "$telegramSubject"
 	fi
 ;;
