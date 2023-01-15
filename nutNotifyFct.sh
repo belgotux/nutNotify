@@ -188,7 +188,7 @@ function conditionalNotification {
 		;;
 	esac
 
-	echo "${method[*]}"
+	#echo "${method[*]}"
 	if [[ " ${method[*]} " =~ " mail " ]] ; then
 		sendMail "$subjectMail" "$text"
 	fi
