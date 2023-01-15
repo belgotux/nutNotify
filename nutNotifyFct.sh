@@ -155,3 +155,54 @@ function sendPushover {
 	rm $tempfile
 	return $returnCurl
 }
+
+function conditionalNotification {
+	local event=$1
+	local text=$2
+	local emoji=$3
+
+	case "$event" in
+		ONLINE)
+			method=${methodOnline[*]}
+		;;
+		ONBATT)
+			method=${methodOnbatt[*]}
+		;;
+		LOWBATT)
+			method=${methodLowbatt[*]}
+		;;
+		FSD)
+			method=${methodFsd[*]}
+		;;
+		SHUTDOWN)
+			method=${methodShutdown[*]}
+		;;
+		COMMOK|COMMBAD|REPLBATT|NOCOMM)
+			method=${methodComm[*]}
+		;;
+		SERVERONLINE)
+			method=${methodServerOnline[*]}
+		;;
+		*)
+			echo "Error : this event is not managed" 1>&2
+		;;
+	esac
+
+	echo "${method[*]}"
+	if [[ " ${method[*]} " =~ " mail " ]] ; then
+		sendMail "$subjectMail" "$text"
+	fi
+	if [[ " ${method[*]} " =~ " pushbullet " ]] ; then
+		sendPushBullet "$pushbulletSubject" "$text"
+	fi
+	if [[ " ${method[*]} " =~ " pushover " ]] ; then
+		sendPushover "$pushoverSubject" "$text"
+	fi
+	if [[ " ${method[*]} " =~ " telegram " ]] ; then
+		sendTelegram "$text" "$telegramSubject" "$emoji"
+	fi
+	if [[ " ${method[*]} " =~ " sms " ]] ; then
+		sendSms "$text"
+	fi
+
+}

@@ -44,3 +44,16 @@ pushoverAppToken='xxxxxxxxxxxxxxxxxxxxxxxxxxxx'		#ApplicationToken
 pushoverUserkey='xxxxxxxxxxxxxxxxxxxxxxxxxxxx'		#UserKey
 pushoverSubject="UPS event $argument"							#subject sent by Pushover
 pushoverMessage="$bodyDefault"										#body message sent by Pushover
+
+# methods to use on event (array to multi alert)
+#   can be mail, telegram, pushober, pushbullet, sms
+#   or an array like '(telegram mail)' for multiple methods
+methodDefault=mail        
+
+methodOnline=$methodDefault
+methodOnbatt=$methodDefault
+methodLowbatt=$methodDefault
+methodFsd=$methodDefault
+methodShutdown=$methodDefault
+methodComm=$methodDefault
+methodServerOnline=$methodDefault

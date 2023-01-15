@@ -29,10 +29,17 @@ powerdownflag=$(sed -ne 's#^ *POWERDOWNFLAG *\(.*\)$#\1#p' /etc/nut/upsmon.conf)
 # Variables
 configFile=/usr/local/etc/nutNotify.conf
 
-source "$configFile"
+if [ ! -e "$(dirname $0)/nutNotifyFct.sh" ] ; then
+	echo "Functions script $(dirname $0)/nutNotifyFct.sh doesn't exist" 1>&2
+	exit 1
+fi
 source "$(dirname $0)/nutNotifyFct.sh"
 
-if [ ! -e "$configFile" ] ; then
+if [ -e "$configFile" ] ; then
+	source "$configFile"
+elif [ -e "$(dirname $0)/nutNotify.conf" ] ; then
+	source "$(dirname $0)/nutNotify.conf"
+else
 	echo "File $configFile doesn't exist" 1>&2
 	exit 1
 fi
@@ -51,66 +58,43 @@ case "$argument" in
 ONLINE)
 	text="UPS $ups is now online at $(date +'%H:%M:%S')"
 	writeLog
-	sendMail "$subjectMail" "$text"
-	#sendPushBullet "$pushbulletSubject" "$text"
-	#sendPushover "$pushoverSubject" "$text"
-	sendTelegram "$text" "$telegramSubject"
+	conditionalNotification $argument "$text" ""
 ;;
 
 ONBATT)
 	text="Powercut at $(date +'%H:%M:%S')! UPS $ups run on battery!"
 	writeLog
-	#sendMail "$subjectMail" "$text"
-	#sendPushBullet "$pushbulletSubject" "$text"
-	#sendPushover "$pushoverSubject" "$text"
 	emoji=$(echo -e "\xE2\x9A\xA0")
-	sendTelegram "$text" "$telegramSubject" "$emoji"
-#	sendSms "$text"
+	conditionalNotification $argument "$text" "$emoji"
 ;;
 
 LOWBATT)
 	# note : notify get when /sbin/upsdrvctl shutdown executed
 	text="Low level battery at $(date +'%H:%M:%S') UPS $ups... Shutdown imminent !"
 	writeLog
-	#sendMail "$subjectMail" "$text"
-	#sendPushBullet "$pushbulletSubject" "$text"
-	#sendPushover "$pushoverSubject" "$text"
 	emoji=$(echo -e "\xF0\x9F\x94\xA5")
-	sendTelegram "$text" "$telegramSubject" "$emoji"
-#	sendSms "$text"
+	conditionalNotification $argument "$text" "$emoji"
 ;;
 
 FSD)
 	# note : for slave only
 	text="Force shutdown slave server $server at $(date +'%H:%M:%S') !"
 	writeLog
-	#sendMail "$subjectMail" "$text"
-	#sendPushBullet "$pushbulletSubject" "$text"
-	#sendPushover "$pushoverSubject" "$text"
 	emoji=$(echo -e "\xE2\x9A\xA0")
-	sendTelegram "$text" "$telegramSubject" "$emoji"
-#	sendSms "$text"
+	conditionalNotification $argument "$text" "$emoji"
 ;;
 
 SHUTDOWN)
 	# note : executed on the master only
 	text="Shutdown master serveur $server at $(date +'%H:%M:%S') !"
 	writeLog
-	#sendMail "$subjectMail" "$text"
-	#sendPushBullet "$pushbulletSubject" "$text"
-	#sendPushover "$pushoverSubject" "$text"
 	emoji=$(echo -e "\xF0\x9F\x94\xA5")
-	sendTelegram "$text" "$telegramSubject" "$emoji"
-#	sendSms "$text"
+	conditionalNotification $argument "$text" "$emoji"
 ;;
 
 COMMOK|COMMBAD|REPLBATT|NOCOMM)
 	writeLog
-	#sendMail
-	#sendPushBullet
-	#sendPushover "$pushoverSubject" "$text"
-	sendTelegram "$text" "$telegramSubject"
-	# sendSms
+	conditionalNotification $argument "$text" ""
 ;;
 
 SERVERONLINE)
@@ -120,11 +104,8 @@ SERVERONLINE)
 		# add your script here to wakeup other servers etc
 		text="Serveur $server online at $(date +'%H:%M:%S') !"
 		rm -f $powerdownflag && \
-		writeLog && \
-		sendMail "$subjectMail" "$text"
-		#sendPushBullet "$pushbulletSubject" "$text"
-		#sendPushover "$pushoverSubject" "$text"
-  	sendTelegram "$text" "$telegramSubject"
+		writeLog
+		conditionalNotification $argument "$text" ""
 	fi
 ;;
 
