@@ -2,7 +2,8 @@
 Script to be notified by your UPS with differents notifications :
 - mail
 - Telegram
-- pushbullet
+- Pushbullet
+- Pushover
 - SMS
 
 ## Install
