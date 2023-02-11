@@ -31,4 +31,6 @@ cp nutNotify.logrotate /etc/logrotate.d
 
 
 ## Link
-See this article for more informations (in french) : https://www.monlinux.net/2018/03/nut-ups-notifications-mails-et-arret/
+Here an article (in french) in my website about [the notification of Nut by Telegram Pushbullet or Pushover](https://www.monlinux.net/2023/02/nut-notifications-push-telegram-pushbullet-pushover-pour-ups/)
+
+You can see a howto to [setup your nut configuration to monitore your UPS from scratch (in french)](https://www.monlinux.net/2018/03/nut-ups-notifications-mails-et-arret/)
