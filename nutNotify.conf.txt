@@ -47,7 +47,7 @@ pushoverMessage="$bodyDefault"										#body message sent by Pushover
 
 #--- Data for Discord ---#
 discordWebhookURL=''
-discordMessage="$bodyDefault"										#body message sent by Pushover
+discordMessage="$bodyDefault"										#body message sent by Discord
 
 # methods to use on event (array to multi alert)
 #   can be mail, telegram, pushober, pushbullet, sms
