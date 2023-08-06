@@ -45,6 +45,10 @@ pushoverUserkey='xxxxxxxxxxxxxxxxxxxxxxxxxxxx'		#UserKey
 pushoverSubject="UPS event $argument"							#subject sent by Pushover
 pushoverMessage="$bodyDefault"										#body message sent by Pushover
 
+#--- Data for Discord ---#
+discordWebhookURL=''
+discordMessage="$bodyDefault"										#body message sent by Pushover
+
 # methods to use on event (array to multi alert)
 #   can be mail, telegram, pushober, pushbullet, sms
 #   or an array like '(telegram mail)' for multiple methods
