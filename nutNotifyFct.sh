@@ -230,6 +230,9 @@ function conditionalNotification {
 	fi
 	if [[ " ${method[*]} " =~ " sms " ]] ; then
 		sendSms "$text"
+	fi 
+ 	if [[ " ${method[*]} " =~ " discord " ]] ; then
+    		sendDiscord "$text"
 	fi
 
 }
