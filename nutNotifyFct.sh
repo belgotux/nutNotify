@@ -174,7 +174,7 @@ function sendDiscord {
         \"content\": \"$message\"
     }"
 
-    curl -s -H "Content-Type: application/json" -d "$payload" "$discordWebhookUrl" > $tempjson
+    curl -s -H "Content-Type: application/json" -X POST -d "$payload" "$discordWebhookURL" > $tempjson
     returnCurl=$?
     if [ $returnCurl -ne 0 ]; then
         cat $tempjson
