@@ -5,6 +5,7 @@ Script to be notified by your UPS with differents notifications :
 - Pushbullet
 - Pushover
 - SMS
+- Discord
 
 ## Install
 - Copy git
@@ -28,7 +29,7 @@ mkdir /var/log/nutNotify
 chown nut:nut /var/log/nutNotify
 cp nutNotify.logrotate /etc/logrotate.d
 ```
-
+Activate nutNotify by editing `upsmon.conf` and replace "NOTIFYCMD" with `/usr/local/bin/nutNotify.sh`. 
 
 ## Link
 Here an article (in french) in my website about [the notification of Nut by Telegram Pushbullet or Pushover](https://www.monlinux.net/2023/02/nut-notifications-push-telegram-pushbullet-pushover-pour-ups/)
