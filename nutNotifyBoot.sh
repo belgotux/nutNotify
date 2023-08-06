@@ -12,7 +12,7 @@ if [ ! -e "$configFile" ] ; then
 fi
 
 function aide() {
-	echo "$0 [mail|pushbullet|telegram]"
+	echo "$0 [mail|pushbullet|telegram|discord]"
 }
 
 # verify method
@@ -29,7 +29,9 @@ elif [ $# == 1 ] ; then
 		echo "Error pushbullet not configured" 1>&2 && echo "Error telegram not configured" > $logfile && exit 1
 	elif [ "$1" == "telegram" ] && [ ! -x $curlBin ] && [ "$telegramAccessToken" != "" ] && [ "$telegramChatID" != "" ] ; then
 		echo "Error telegram not configured" 1>&2 && echo "Error telegram not configured" > $logfile && exit 1
-	elif [ "$1" == "mail" ] || [ "$1" == "pushbullet" ] || [ "$1" == "telegram" ] ; then
+  	elif [ "$1" == "discord" ] && [ ! -x $curlBin ] && [ "$discordWebhookURL" != "" ] ; then
+   		echo "Error discord is not configured" 1>&2 && echo "Error discord is not configured" > $logfile && exit 1
+	elif [ "$1" == "mail" ] || [ "$1" == "pushbullet" ] || [ "$1" == "telegram" ] || [ "$1" == "discord" ] ; then
 		notifynut_method="$1"
 	else
 		aide
@@ -52,6 +54,8 @@ if [ -e $flagfile ] ; then
 		sleep 30; sendTelegram "$text" "$telegramSubject" ;;
 	pushover)
 		sleep 30; sendPushover "$text" "$pushoverSubject" ;;
+  	discord)
+   		sleep 30; sendDiscord "$text" ;;
 	esac
     rm $flagfile
 fi
