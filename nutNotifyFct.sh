@@ -163,7 +163,7 @@ function sendDiscord {
     fi
 
     #var verification
-    if [ "$discordWebhookUrl" == "" ]; then
+    if [ "$discordWebhookURL" == "" ]; then
         echo "Can't send message without a Discord webhook URL" 1>&2
         addLog "Can't send message without a Discord webhook URL"
         return 1
