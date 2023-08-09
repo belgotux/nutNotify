@@ -156,6 +156,33 @@ function sendPushover {
 	return $returnCurl
 }
 
+function sendDiscord {
+	#replace default mesg
+    if [ "$2" != "" ] ; then
+        textDiscord="$2"
+    fi
+
+    #var verification
+    if [ "$discordWebhookURL" == "" ]; then
+        echo "Can't send message without a Discord webhook URL" 1>&2
+        addLog "Can't send message without a Discord webhook URL"
+        return 1
+    fi
+
+    tempjson=$(mktemp --suffix '.nutNotifyDiscord')
+    payload="{
+        \"content\": \"$message\"
+    }"
+
+    curl -s -H "Content-Type: application/json" -X POST -d "$payload" "$discordWebhookURL" > $tempjson
+    returnCurl=$?
+    if [ $returnCurl -ne 0 ]; then
+        cat $tempjson
+    fi
+    rm $tempjson
+    return $returnCurl
+}
+
 function conditionalNotification {
 	local event=$1
 	local text=$2
@@ -203,6 +230,9 @@ function conditionalNotification {
 	fi
 	if [[ " ${method[*]} " =~ " sms " ]] ; then
 		sendSms "$text"
+	fi 
+ 	if [[ " ${method[*]} " =~ " discord " ]] ; then
+    		sendDiscord "$text"
 	fi
 
 }
